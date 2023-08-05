@@ -6,11 +6,10 @@ import sys
 
 
 def main():
-    directory = os.getcwd()
-
     args = get_args()
+    directory = args.d
     pattern = args.p
-    date = str(args.d)
+    date = str(args.t)
     separator = args.s
 
     check_separator(separator)
@@ -18,8 +17,10 @@ def main():
     rename_files(directory, pattern, date, separator)
 
 
-# Rename file(s) in the current directory, prefix a date and replace whitespace with a separator
+# Rename file(s) in the specified directory (defaulted to current dir),
+# prefix a date and replace whitespace with a separator
 def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
+    os.chdir(dir)
     for filename in os.scandir(dir):
         new_name = get_new_name(date, separator, filename.name)
         if filename.is_file() and re.match(pattern, filename.name):
@@ -40,10 +41,17 @@ def get_today() -> int:
 # Add arg defaults and return args
 def get_args():
     today = get_today()
+    default_dir = os.getcwd()
 
     parser = argparse.ArgumentParser(description="Replace whitespace with dashes")
     parser.add_argument(
         "-d",
+        default=default_dir,
+        help="prefixes the date as today's date in format YYMMDD, indicate '0' for no date prefix",
+        type=str,
+    )
+    parser.add_argument(
+        "-t",
         default=today,
         help="prefixes the date as today's date in format YYMMDD, indicate '0' for no date prefix",
         type=int,
@@ -60,7 +68,7 @@ def get_args():
     return parser.parse_args()
 
 
-# Returns the filename with a date prefix by default, or as is if date=str(args.d) == "0"
+# Returns the filename with a date prefix by default, or as is if date=str(args.t) == "0"
 def get_new_name(date: str, separator: str, filename: str) -> str:
     if date == "0":
         return filename
