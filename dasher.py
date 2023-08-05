@@ -47,7 +47,7 @@ def get_args():
     parser.add_argument(
         "-d",
         default=default_dir,
-        help="prefixes the date as today's date in format YYMMDD, indicate '0' for no date prefix",
+        help="specify directory, default is current directory",
         type=str,
     )
     parser.add_argument(
