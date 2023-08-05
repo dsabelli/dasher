@@ -9,7 +9,7 @@ def main():
     args = get_args()
     directory = args.d
     pattern = args.p
-    date = str(args.t)
+    date = args.t
     separator = args.s
 
     check_separator(separator)
@@ -34,8 +34,8 @@ def replace_whitespace(filename: str, repl: str) -> str:
 
 
 # Get todays date and format as an int formatted as YYMMDD
-def get_today() -> int:
-    return int(datetime.date.today().strftime("%y%m%d"))
+def get_today() -> str:
+    return datetime.date.today().strftime("%y%m%d")
 
 
 # Add arg defaults and return args
@@ -54,7 +54,7 @@ def get_args():
         "-t",
         default=today,
         help="prefixes the date as today's date in format YYMMDD, indicate '0' for no date prefix",
-        type=int,
+        type=str,
     )
     parser.add_argument(
         "-s",
@@ -68,7 +68,7 @@ def get_args():
     return parser.parse_args()
 
 
-# Returns the filename with a date prefix by default, or as is if date=str(args.t) == "0"
+# Returns the filename with a date prefix by default, or as is if date=args.t == "0"
 def get_new_name(date: str, separator: str, filename: str) -> str:
     if date == "0":
         return filename
