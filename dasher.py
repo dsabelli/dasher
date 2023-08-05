@@ -12,7 +12,8 @@ def main():
     date = args.t
     separator = args.s
 
-    check_separator(separator)
+    validate_date(date)
+    validate_separator(separator)
 
     rename_files(directory, pattern, date, separator)
 
@@ -29,7 +30,7 @@ def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
 
 # replace all whitespace with dashes by default
 def replace_whitespace(filename: str, repl: str) -> str:
-    pattern = r"\s"
+    pattern = r"[-\s_]"
     return re.sub(pattern, repl, filename)
 
 
@@ -76,8 +77,15 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
         return date + separator + filename
 
 
-# Checks if the separator is a dash or underscore, exits with message if it isn't
-def check_separator(separator: str) -> None:
+# validates if the date is YYMMDD or 0, exits with message if it isn't
+def validate_date(date: str) -> None:
+    pattern = r"\b(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{2}\b"
+    if re.match(pattern, date) and date != "_":
+        sys.exit("Date must be either YYMMDD or 0")
+
+
+# validates if the separator is a dash or underscore, exits with message if it isn't
+def validate_separator(separator: str) -> None:
     if separator != "-" and separator != "_":
         sys.exit("Separator must be either '-' or '_'")
 
