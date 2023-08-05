@@ -6,29 +6,24 @@ import sys
 
 
 def main():
-    args = get_args()
-
     directory = os.getcwd()
+
+    args = get_args()
     pattern = args.p
     date = str(args.d)
     separator = args.s
-    print(separator)
 
-    if separator != "-" and separator != "_":
-        sys.exit("Separator must be either '-' or '_'")
-    # Rename file(s) in the current directory, prefix a date and replace whitespace with a separator
+    check_separator(separator)
+
     rename_files(directory, pattern, date, separator)
 
 
+# Rename file(s) in the current directory, prefix a date and replace whitespace with a separator
 def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
-    for filename in os.listdir(dir):
-        newName = ""
-        if date == "0":
-            newName = filename
-        else:
-            newName = date + separator + filename
-        if re.match(pattern, filename):
-            os.rename(filename, replace_whitespace(newName, separator))
+    for filename in os.scandir(dir):
+        new_name = get_new_name(date, separator, filename.name)
+        if filename.is_file() and re.match(pattern, filename.name):
+            os.rename(filename.name, replace_whitespace(new_name, separator))
 
 
 # replace all whitespace with dashes by default
@@ -42,7 +37,7 @@ def get_today() -> int:
     return int(datetime.date.today().strftime("%y%m%d"))
 
 
-# Add arg default and return args
+# Add arg defaults and return args
 def get_args():
     today = get_today()
 
@@ -65,12 +60,19 @@ def get_args():
     return parser.parse_args()
 
 
+# Returns the filename with a date prefix by default, or as is if date=str(args.d) == "0"
+def get_new_name(date: str, separator: str, filename: str) -> str:
+    if date == "0":
+        return filename
+    else:
+        return date + separator + filename
+
+
+# Checks if the separator is a dash or underscore, exits with message if it isn't
+def check_separator(separator: str) -> None:
+    if separator != "-" and separator != "_":
+        sys.exit("Separator must be either '-' or '_'")
+
+
 if __name__ == "__main__":
     main()
-
-# look into using *args and **kwargs
-# look into -d "0" for a no date option, add to helper
-# validate adding a pattern for targeting specific files
-# restrict separator to - and _
-
-# write unit tests
