@@ -70,6 +70,7 @@ def get_args():
 
 
 # Returns the filename with a date prefix by default, or as is if date=args.t == "0"
+# Is called after validate_date and assumed the date format is YYMMDD or 0
 def get_new_name(date: str, separator: str, filename: str) -> str:
     if date == "0":
         return filename
@@ -79,8 +80,12 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
 
 # validates if the date is YYMMDD or 0, exits with message if it isn't
 def validate_date(date: str) -> None:
-    pattern = r"\b(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{2}\b"
-    if re.match(pattern, date) and date != "_":
+    if date == "0":
+        return
+    try:
+        datetime.datetime.strptime(date, "%y%m%d")
+        return
+    except ValueError:
         sys.exit("Date must be either YYMMDD or 0")
 
 
