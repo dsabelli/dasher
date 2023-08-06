@@ -40,7 +40,7 @@ def get_today() -> str:
 
 
 # Add arg defaults and return args
-def get_args():
+def get_args(args=None):
     today = get_today()
     default_dir = os.getcwd()
 
