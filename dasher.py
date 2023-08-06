@@ -66,7 +66,7 @@ def get_args(args=None):
     parser.add_argument(
         "-p", default=".", help="define regex pattern, defaults to all files", type=str
     )
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 # Returns the filename with a date prefix by default, or as is if date=args.t == "0"
