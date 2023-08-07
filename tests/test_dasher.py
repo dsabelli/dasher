@@ -89,14 +89,14 @@ def test_rename_files_valid():
 
 def test_rename_files_specify_file():
     directory = os.getcwd()
-    file_name1 = "first test file.txt"
+    file_name1 = "test file one.txt"
     file_path1 = os.path.join(directory, file_name1)
     file = open(file_path1, "w").close()
-    file_name2 = "second test file.txt"
+    file_name2 = "test file two.txt"
     file_path2 = os.path.join(directory, file_name2)
     file = open(file_path2, "w").close()
-    rename_files(directory, "first", get_today(), "-")
-    assert os.listdir(directory)[0] == get_today() + "-first-test-file.txt"
-    os.remove(directory + "/" + get_today() + "-first-test-file.txt")
-    assert os.listdir(directory)[0] == "second test file.txt"
-    os.remove(directory + "/" + "second test file.txt")
+    rename_files(directory, "one", get_today(), "-")
+    assert os.listdir(directory)[1] == get_today() + "-test-file-one.txt"
+    os.remove(directory + "/" + get_today() + "-test-file-one.txt")
+    assert os.listdir(directory)[0] == "test file two.txt"
+    os.remove(directory + "/" + "test file two.txt")

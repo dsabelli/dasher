@@ -1,3 +1,4 @@
+#!/opt/homebrew/bin/python3
 import os
 import re
 import argparse
@@ -24,7 +25,7 @@ def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
     os.chdir(dir)
     for filename in os.scandir(dir):
         new_name = get_new_name(date, separator, filename.name)
-        if filename.is_file() and re.match(pattern, filename.name):
+        if filename.is_file() and re.search(pattern, filename.name):
             os.rename(filename.name, replace_whitespace(new_name, separator))
 
 
