@@ -1,7 +1,3 @@
-# test dasher replaces spaces in specific file
-# test dasher replaces blank spaces in specified directory
-
-
 import os
 import pytest
 from dasher import (
@@ -16,7 +12,7 @@ from dasher import (
 
 
 def test_get_today():
-    assert get_today() == "230806"
+    assert get_today() == "230807"
 
 
 def test_replace_whitespace():
@@ -30,9 +26,9 @@ def test_replace_whitespace():
 
 
 def test_validate_date_valid():
-    assert validate_date("230806") == None
-    assert validate_date("991231") == None
-    assert validate_date("0") == None
+    assert validate_date("230806") == True
+    assert validate_date("991231") == True
+    assert validate_date("0") == True
 
 
 def test_validate_date_invalid():
@@ -45,8 +41,8 @@ def test_validate_date_invalid():
 
 
 def test_validate_separator_valid():
-    assert validate_separator("-") == None
-    assert validate_separator("_") == None
+    assert validate_separator("-") == True
+    assert validate_separator("_") == True
 
 
 def test_validate_separator_invalid():
@@ -61,6 +57,7 @@ def test_validate_separator_invalid():
 def test_get_new_name():
     assert get_new_name("0", "-", "filename") == "filename"
     assert get_new_name(get_today(), "-", "filename") == get_today() + "-filename"
+    assert get_new_name(get_today(), "-", "230807-filename") == "230807-filename"
 
 
 def test_get_args_inputs():
@@ -78,3 +75,28 @@ def test_get_args_defaults():
     assert parsed_args.t == get_today()
     assert parsed_args.s == "-"
     assert parsed_args.p == "."
+
+
+def test_rename_files_valid():
+    directory = os.getcwd() + "/test_files"
+    file_name = "test file.txt"
+    file_path = os.path.join(directory, file_name)
+    file = open(file_path, "w").close()
+    rename_files(directory, ".", get_today(), "-")
+    assert os.listdir(directory)[0] == get_today() + "-test-file.txt"
+    os.remove(directory + "/" + get_today() + "-test-file.txt")
+
+
+def test_rename_files_specify_file():
+    directory = os.getcwd()
+    file_name1 = "first test file.txt"
+    file_path1 = os.path.join(directory, file_name1)
+    file = open(file_path1, "w").close()
+    file_name2 = "second test file.txt"
+    file_path2 = os.path.join(directory, file_name2)
+    file = open(file_path2, "w").close()
+    rename_files(directory, "first", get_today(), "-")
+    assert os.listdir(directory)[0] == get_today() + "-first-test-file.txt"
+    os.remove(directory + "/" + get_today() + "-first-test-file.txt")
+    assert os.listdir(directory)[0] == "second test file.txt"
+    os.remove(directory + "/" + "second test file.txt")
