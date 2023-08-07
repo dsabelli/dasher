@@ -19,7 +19,7 @@ def main():
 
 
 # Rename file(s) in the specified directory (defaulted to current dir),
-# prefix a date and replace whitespace with a separator
+# prefix a date and replace whitespace (or dash/underscore) with a separator
 def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
     os.chdir(dir)
     for filename in os.scandir(dir):
@@ -34,7 +34,7 @@ def replace_whitespace(filename: str, repl: str) -> str:
     return re.sub(pattern, repl, filename)
 
 
-# Get todays date and format as an int formatted as YYMMDD
+# Get todays date and returns formatted as YYMMDD
 def get_today() -> str:
     return datetime.date.today().strftime("%y%m%d")
 
@@ -71,7 +71,13 @@ def get_args(args=None):
 
 # Returns the filename with a date prefix by default, or as is if date=args.t == "0"
 # Is called after validate_date and assumed the date format is YYMMDD or 0
+# Does not prefix a date if a date as YYMMDD is already present
 def get_new_name(date: str, separator: str, filename: str) -> str:
+    try:
+        datetime.datetime.strptime(filename[:6], "%y%m%d")
+        return filename
+    except ValueError:
+        ...
     if date == "0":
         return filename
     else:
@@ -79,20 +85,21 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
 
 
 # validates if the date is YYMMDD or 0, exits with message if it isn't
-def validate_date(date: str) -> None:
+def validate_date(date: str) -> bool:
     if date == "0":
-        return
+        return True
     try:
         datetime.datetime.strptime(date, "%y%m%d")
-        return
+        return True
     except ValueError:
         sys.exit("Date must be either YYMMDD or 0")
 
 
 # validates if the separator is a dash or underscore, exits with message if it isn't
-def validate_separator(separator: str) -> None:
+def validate_separator(separator: str) -> bool:
     if separator != "-" and separator != "_":
         sys.exit("Separator must be either '-' or '_'")
+    return True
 
 
 if __name__ == "__main__":
