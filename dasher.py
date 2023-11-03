@@ -4,6 +4,7 @@ import re
 import argparse
 import datetime
 import sys
+from PIL import Image
 
 
 def main():
@@ -73,16 +74,17 @@ def get_args(args=None):
 # Returns the filename with a date prefix by default, or as is if date=args.t == "0"
 # Is called after validate_date and assumed the date format is YYMMDD or 0
 # Does not prefix a date if a date as YYMMDD is already present
+# Use double separator to differentiate files that have a date prefix not from Dasher
 def get_new_name(date: str, separator: str, filename: str) -> str:
     try:
-        datetime.datetime.strptime(filename[:6], "%y%m%d")
+        datetime.datetime.strptime(filename[:7], "%y%m%d" + separator)
         return filename
     except ValueError:
         ...
     if date == "0":
         return filename
     else:
-        return date + separator + filename
+        return date + separator + separator + filename
 
 
 # validates if the date is YYMMDD or 0, exits with message if it isn't
