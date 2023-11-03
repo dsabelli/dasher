@@ -20,6 +20,9 @@ def main():
     rename_files(directory, pattern, date, separator)
 
 
+# loop through files in directory. Scan for today's date with double separator
+
+
 # Rename file(s) in the specified directory (defaulted to current dir),
 # prefix a date and replace whitespace (or dash/underscore) with a separator
 def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
@@ -77,8 +80,12 @@ def get_args(args=None):
 # Use double separator to differentiate files that have a date prefix not from Dasher
 def get_new_name(date: str, separator: str, filename: str) -> str:
     try:
-        datetime.datetime.strptime(filename[:7], "%y%m%d" + separator)
-        return filename
+        if (
+            datetime.datetime.strptime(filename[:6], "%y%m%d")
+            and filename[7] == separator
+            and filename[8] == separator
+        ):
+            return filename
     except ValueError:
         ...
     if date == "0":
