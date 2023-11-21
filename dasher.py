@@ -7,6 +7,7 @@ import sys
 from PIL import Image
 
 #todo: 
+# move renamed files to dasher-processed folder
 # comments for file compression functions
 # error handling
 # testing for file compression
@@ -100,7 +101,7 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
     try:
         if (
             datetime.datetime.strptime(filename[:6], "%y%m%d")
-            and filename[6:8] == separator+separator
+            and filename[6] == separator
         ):
             return filename
     except ValueError:
@@ -108,7 +109,7 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
     if date == "0":
         return filename
     else:
-        return date + separator + separator + filename
+        return date + separator + filename
 
 
 # validates if the date is YYMMDD or 0, exits with message if it isn't
@@ -129,7 +130,7 @@ def validate_separator(separator: str) -> bool:
     return True
 
 def resize_images(dir: str, separator: str, size:int,quality:int) -> None:
-    pattern = re.compile(r"(--|__).*(\.jpg|\.jpeg)$")
+    pattern = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
     os.chdir(dir)
     for filename in os.scandir(dir):
         if filename.is_file() and re.search(pattern, filename.name):
