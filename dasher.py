@@ -1,5 +1,6 @@
 #!/opt/homebrew/bin/python3
 import os
+import shutil
 import re
 import argparse
 import datetime
@@ -18,15 +19,19 @@ def main():
     args = get_args()
     size = args.c
     directory = args.d
+    output_directory = args.o
     pattern = args.p
     date = args.t
     separator = args.s
+
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
 
     validate_date(date)
     validate_separator(separator)
 
     rename_files(directory, pattern, date, separator)
-    resize_images(directory,separator,size,QUALITY)
+    resize_images(directory,output_directory,size,QUALITY)
     
 
 
@@ -64,6 +69,12 @@ def get_args(args=None):
         "-d",
         default=default_dir,
         help="specify directory, default is current directory",
+        type=str,
+    )
+    parser.add_argument(
+        "-o",
+        default=default_dir+"/dasher_output",
+        help="specify ooutput directory, default is current directory/dasher_output",
         type=str,
     )
     parser.add_argument(
@@ -129,12 +140,14 @@ def validate_separator(separator: str) -> bool:
         sys.exit("Separator must be either '-' or '_'")
     return True
 
-def resize_images(dir: str, separator: str, size:int,quality:int) -> None:
+def resize_images(dir: str, output_dir:str, size:int,quality:int) -> None:
     pattern = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
     os.chdir(dir)
     for filename in os.scandir(dir):
         if filename.is_file() and re.search(pattern, filename.name):
             check_image_size(filename.name,size,quality)
+            shutil.move(os.path.join(dir, filename.name), os.path.join(output_dir, filename.name))
+
 
 def check_image_size(file_path:str,size:int,quality:int)->None:
     current_size = os.stat(file_path).st_size
