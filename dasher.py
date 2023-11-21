@@ -103,7 +103,7 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
             datetime.datetime.strptime(filename[:6], "%y%m%d")
             and filename[6] == separator
         ):
-            return filename
+            return date+filename[6:]
     except ValueError:
         ...
     if date == "0":
