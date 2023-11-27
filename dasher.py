@@ -8,7 +8,6 @@ import sys
 from PIL import Image
 
 #todo: 
-# move renamed files to dasher-processed folder
 # comments for file compression functions
 # error handling
 # testing for file compression
