@@ -13,13 +13,17 @@ def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
     for filename in os.scandir(dir):
         # Check if the current item is a file and its name matches the defined pattern
         if filename.is_file() and re.search(pattern, filename.name):
-            # Check the size of the image file and compress it if necessary
-            check_image_size(filename.name, size, quality)
-            # Move the compressed image file to the output directory
-            shutil.move(
+            # Copy the image file to the output directory
+            shutil.copyfile(
                 os.path.join(dir, filename.name),
                 os.path.join(output_dir, filename.name),
             )
+    # Change the current directory to the output directory
+    os.chdir(output_dir)
+    # Iterate over all files in the output directory
+    for filename in os.scandir(output_dir):
+        # Check the size of the image file and compress it if necessary
+        check_image_size(filename.name, size, quality)
 
 
 def check_image_size(file_path: str, size: int, quality: int) -> None:
