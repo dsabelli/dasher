@@ -1,14 +1,13 @@
 #!/opt/homebrew/bin/python3
 import os
-import re
 import argparse
 import datetime
-import sys
+import validators
+from rename import rename_files
 from img_compress import resize_images
 
 
 # todo:
-# comments for file compression functions
 # error handling
 # testing for file compression
 # folder watching
@@ -26,40 +25,16 @@ def main():
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
-    validate_date(date)
-    validate_separator(separator)
+    validators.validate_date(date)
+    validators.validate_separator(separator)
 
     rename_files(directory, pattern, date, separator)
     resize_images(directory, output_directory, size, QUALITY)
 
 
-# loop through files in directory. Scan for today's date with double separator
-
-
-# Rename file(s) in the specified directory (defaulted to current dir),
-# prefix a date and replace whitespace (or dash/underscore) with a separator
-def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
-    os.chdir(dir)
-    for filename in os.scandir(dir):
-        new_name = get_new_name(date, separator, filename.name)
-        if filename.is_file() and re.search(pattern, filename.name):
-            os.rename(filename.name, replace_whitespace(new_name, separator))
-
-
-# replace all whitespace with dashes by default
-def replace_whitespace(filename: str, repl: str) -> str:
-    pattern = r"[-\s_]"
-    return re.sub(pattern, repl, filename)
-
-
-# Get todays date and returns formatted as YYMMDD
-def get_today() -> str:
-    return datetime.date.today().strftime("%y%m%d")
-
-
 # Add arg defaults and return args
 def get_args(args=None):
-    today = get_today()
+    today = datetime.date.today().strftime("%y%m%d")
     default_dir = os.getcwd()
 
     parser = argparse.ArgumentParser(description="Replace whitespace with dashes")
@@ -97,43 +72,6 @@ def get_args(args=None):
         type=int,
     )
     return parser.parse_args(args)
-
-
-# Returns the filename with a date prefix by default, or as is if date=args.t == "0"
-# Is called after validate_date and assumed the date format is YYMMDD or 0
-# Does not prefix a date if a date as YYMMDD is already present
-# Use double separator to differentiate files that have a date prefix not from Dasher
-def get_new_name(date: str, separator: str, filename: str) -> str:
-    try:
-        if (
-            datetime.datetime.strptime(filename[:6], "%y%m%d")
-            and filename[6] == separator
-        ):
-            return date + filename[6:]
-    except ValueError:
-        ...
-    if date == "0":
-        return filename
-    else:
-        return date + separator + filename
-
-
-# validates if the date is YYMMDD or 0, exits with message if it isn't
-def validate_date(date: str) -> bool:
-    if date == "0":
-        return True
-    try:
-        datetime.datetime.strptime(date, "%y%m%d")
-        return True
-    except ValueError:
-        sys.exit("Date must be either YYMMDD or 0")
-
-
-# validates if the separator is a dash or underscore, exits with message if it isn't
-def validate_separator(separator: str) -> bool:
-    if separator != "-" and separator != "_":
-        sys.exit("Separator must be either '-' or '_'")
-    return True
 
 
 if __name__ == "__main__":
