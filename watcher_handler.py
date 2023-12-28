@@ -9,6 +9,5 @@ class MyHandler(FileSystemEventHandler):
         self.arg3 = arg3
         self.arg4 = arg4
 
-    def on_created(self, event):
-        # Call your function here with the required arguments
+    def on_any_event(self, event):
         self.func(self.arg1, self.arg2, self.arg3, self.arg4)
