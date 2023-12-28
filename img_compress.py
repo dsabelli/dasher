@@ -5,6 +5,8 @@ from PIL import Image
 
 
 def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
+    # A list for images we want to compress
+    files_to_compress = []
     # Define a regular expression pattern to match filenames ending with .jpg or .jpeg
     pattern = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
     # Change the current directory to the directory containing the images
@@ -13,6 +15,8 @@ def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
     for filename in os.scandir(dir):
         # Check if the current item is a file and its name matches the defined pattern
         if filename.is_file() and re.search(pattern, filename.name):
+            # Add filename to list of images we want to compress
+            files_to_compress.append(filename.name)
             # Copy the image file to the output directory
             shutil.copyfile(
                 os.path.join(dir, filename.name),
@@ -22,8 +26,10 @@ def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
     os.chdir(output_dir)
     # Iterate over all files in the output directory
     for filename in os.scandir(output_dir):
-        # Check the size of the image file and compress it if necessary
-        check_image_size(filename.name, size, quality)
+        # Check if the filename is in our list of files to compress
+        if filename.name in files_to_compress:
+            # Check the size of the image file and compress it if necessary
+            check_image_size(filename.name, size, quality)
 
 
 def check_image_size(file_path: str, size: int, quality: int) -> None:
