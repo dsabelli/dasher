@@ -3,8 +3,11 @@ import os
 import argparse
 import datetime
 import validators
+import time
+from watchdog.observers import Observer
 from rename import rename_files
 from img_compress import resize_images
+from watcher_handler import MyHandler
 
 
 # todo:
@@ -28,8 +31,20 @@ def main():
     validators.validate_date(date)
     validators.validate_separator(separator)
 
-    rename_files(directory, pattern, date, separator)
-    resize_images(directory, output_directory, size, QUALITY)
+    rename = MyHandler(rename_files, directory, pattern, date, separator)
+    resize = MyHandler(resize_images, directory, output_directory, size, QUALITY)
+    observer = Observer()
+    observer.schedule(rename, path=directory, recursive=True)
+    observer.schedule(resize, path=directory, recursive=True)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
 
 
 # Add arg defaults and return args
