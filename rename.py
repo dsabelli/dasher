@@ -2,6 +2,8 @@ import os
 import re
 import datetime
 
+PATTERN = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
+
 
 def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
     # Change the current directory to the directory containing the files
@@ -10,8 +12,12 @@ def rename_files(dir: str, pattern: str, date: str, separator: str) -> None:
     for filename in os.scandir(dir):
         # Generate a new name for the file
         new_name = get_new_name(date, separator, filename.name)
-        # Check if the current item is a file and its name matches the defined pattern
-        if filename.is_file() and re.search(pattern, filename.name):
+        # Check if the current item is a file and its name matches the defined patterns
+        if (
+            filename.is_file()
+            and re.search(pattern, filename.name)
+            and re.search(PATTERN, filename.name)
+        ):
             # Rename the file with the generated new name
             os.rename(filename.name, replace_whitespace(new_name, separator))
 
