@@ -1,13 +1,13 @@
 #!/opt/homebrew/bin/python3
 import os
-import shutil
 import re
 import argparse
 import datetime
 import sys
-from PIL import Image
+from img_compress import resize_images
 
-#todo: 
+
+# todo:
 # comments for file compression functions
 # error handling
 # testing for file compression
@@ -30,8 +30,7 @@ def main():
     validate_separator(separator)
 
     rename_files(directory, pattern, date, separator)
-    resize_images(directory,output_directory,size,QUALITY)
-    
+    resize_images(directory, output_directory, size, QUALITY)
 
 
 # loop through files in directory. Scan for today's date with double separator
@@ -72,7 +71,7 @@ def get_args(args=None):
     )
     parser.add_argument(
         "-o",
-        default=default_dir+"/dasher_output",
+        default=default_dir + "/dasher_output",
         help="specify ooutput directory, default is current directory/dasher_output",
         type=str,
     )
@@ -89,16 +88,13 @@ def get_args(args=None):
         type=str,
     )
     parser.add_argument(
-        "-p", 
-        default=".", 
-        help="define regex pattern, defaults to all files", 
-        type=str
+        "-p", default=".", help="define regex pattern, defaults to all files", type=str
     ),
     parser.add_argument(
-        "-c", 
-        default=200000, 
-        help="define image compression size as an integer, defaults to 200000", 
-        type=int
+        "-c",
+        default=200000,
+        help="define image compression size as an integer, defaults to 200000",
+        type=int,
     )
     return parser.parse_args(args)
 
@@ -113,7 +109,7 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
             datetime.datetime.strptime(filename[:6], "%y%m%d")
             and filename[6] == separator
         ):
-            return date+filename[6:]
+            return date + filename[6:]
     except ValueError:
         ...
     if date == "0":
@@ -139,32 +135,6 @@ def validate_separator(separator: str) -> bool:
         sys.exit("Separator must be either '-' or '_'")
     return True
 
-def resize_images(dir: str, output_dir:str, size:int,quality:int) -> None:
-    pattern = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
-    os.chdir(dir)
-    for filename in os.scandir(dir):
-        if filename.is_file() and re.search(pattern, filename.name):
-            check_image_size(filename.name,size,quality)
-            shutil.move(os.path.join(dir, filename.name), os.path.join(output_dir, filename.name))
-
-
-def check_image_size(file_path:str,size:int,quality:int)->None:
-    current_size = os.stat(file_path).st_size
-    while current_size > size or quality ==0:
-        if quality == 0:
-            os.remove(file_path)
-            print("File cannot be compressed to defined size")
-            break
-
-        compress_image(file_path,quality)
-        current_size = os.stat(file_path).st_size
-        quality-=5
-
-def compress_image(file_path:str,quality:int)->int:
-    image = Image.open(file_path)
-    image.save(file_path,"JPEG",optimize=True,quality=quality)
-    compressed_size = os.stat(file_path).st_size
-    return compressed_size
 
 if __name__ == "__main__":
     main()
