@@ -10,11 +10,6 @@ from img_compress import resize_images
 from watcher_handler import MyHandler
 
 
-# todo:
-# error handling
-# testing for file compression
-# folder watching
-# folder cleanup
 def main():
     QUALITY = 95
 
@@ -43,8 +38,8 @@ def main():
 
     # create observer object and set handlers and directory to watch
     observer = Observer()
-    observer.schedule(rename, path=directory, recursive=True)
-    observer.schedule(resize, path=directory, recursive=True)
+    observer.schedule(rename, path=directory, recursive=False)
+    observer.schedule(resize, path=directory, recursive=False)
     observer.start()
 
     try:
