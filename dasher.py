@@ -41,6 +41,8 @@ def main():
     observer.schedule(rename, path=directory, recursive=False)
     observer.schedule(resize, path=directory, recursive=False)
     observer.start()
+    print("Watching directory: " + directory)
+    print("Files will be output to: " + output_directory)
 
     try:
         # Enter an infinite loop
