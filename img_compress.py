@@ -3,25 +3,13 @@ import os
 import shutil
 from PIL import Image
 
+# Define a regular expression pattern to match filenames ending with .jpg or .jpeg
+PATTERN = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
+
 
 def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
-    # A list for images we want to compress
-    files_to_compress = []
-    # Define a regular expression pattern to match filenames ending with .jpg or .jpeg
-    pattern = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
-    # Change the current directory to the directory containing the images
-    os.chdir(dir)
-    # Iterate over all files in the current directory
-    for filename in os.scandir(dir):
-        # Check if the current item is a file and its name matches the defined pattern
-        if filename.is_file() and re.search(pattern, filename.name):
-            # Add filename to list of images we want to compress
-            files_to_compress.append(filename.name)
-            # Copy the image file to the output directory
-            shutil.copyfile(
-                os.path.join(dir, filename.name),
-                os.path.join(output_dir, filename.name),
-            )
+    # Copy images to the output directory and store the returned list of files to compress
+    files_to_compress = copy_image(dir, output_dir)
     # Change the current directory to the output directory
     os.chdir(output_dir)
     # Iterate over all files in the output directory
@@ -30,6 +18,26 @@ def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
         if filename.name in files_to_compress:
             # Check the size of the image file and compress it if necessary
             check_image_size(filename.name, size, quality)
+
+
+def copy_image(dir: str, output_dir: str) -> list[str]:
+    # A list for images we want to compress
+    files_to_compress = []
+    # Change the current directory to the directory containing the images
+    os.chdir(dir)
+    # Iterate over all files in the current directory
+    for filename in os.scandir(dir):
+        # Check if the current item is a file and its name matches the defined pattern
+        if filename.is_file() and re.search(PATTERN, filename.name):
+            # Add filename to list of images we want to compress
+            files_to_compress.append(filename.name)
+            # Copy the image file to the output directory
+            shutil.copyfile(
+                os.path.join(dir, filename.name),
+                os.path.join(output_dir, filename.name),
+            )
+    # Return the list of file names to compress
+    return files_to_compress
 
 
 def check_image_size(file_path: str, size: int, quality: int) -> None:
