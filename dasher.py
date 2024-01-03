@@ -33,8 +33,8 @@ def main():
     validators.validate_separator(separator)
 
     # create handlers for watcher and pass in function and function args
-    rename = MyHandler(rename_files, directory, pattern, date, separator)
-    resize = MyHandler(resize_images, directory, output_directory, size, QUALITY)
+    rename = MyHandler(rename_files, directory, pattern, date, separator,0)
+    resize = MyHandler(resize_images, directory, output_directory, size, QUALITY,1)
 
     # create observer object and set handlers and directory to watch
     observer = Observer()
