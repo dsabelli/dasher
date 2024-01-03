@@ -5,11 +5,14 @@ from PIL import Image
 
 # Define a regular expression pattern to match filenames ending with .jpg or .jpeg
 PATTERN = re.compile(r"(-|_).*(\.jpg|\.jpeg)$")
+ORIGINALS = "originals"
 
 
 def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
     # Copy images to the output directory and store the returned list of files to compress
     files_to_compress = copy_image(dir, output_dir)
+    # move the original files from the current directory into the ORIGINALS directory
+    move_originals(dir,files_to_compress)
     # Change the current directory to the output directory
     os.chdir(output_dir)
     # Iterate over all files in the output directory
@@ -18,6 +21,15 @@ def resize_images(dir: str, output_dir: str, size: int, quality: int) -> None:
         if filename.name in files_to_compress:
             # Check the size of the image file and compress it if necessary
             check_image_size(filename.name, size, quality)
+
+def move_originals (dir:str,files: list[str]) -> None:
+      # create the output directory if it doesn't exist
+    if not os.path.exists(ORIGINALS):
+        os.makedirs(ORIGINALS)
+    originals_dir = os.path.join(os.getcwd(),ORIGINALS)
+    # move the original files into the ORIGINALS directory
+    for filename in files:
+        shutil.move(os.path.join(dir, filename),os.path.join(originals_dir, filename))
 
 
 def copy_image(dir: str, output_dir: str) -> list[str]:
