@@ -38,9 +38,12 @@ def get_new_name(date: str, separator: str, filename: str) -> str:
         try:
             if (
                 datetime.datetime.strptime(filename[:6], "%y%m%d")
-                and filename[6] == separator
+                
             ):
-                return date + filename[6:]
+                if re.match(r"^[a-zA-Z0-9]*$",filename[6]):
+                    return date + separator + filename[6:]
+                else:
+                    return date + filename[6:]
         except ValueError:
             return date + separator + filename
         # If successful, return the date followed by the rest of the filename
